@@ -1,0 +1,55 @@
+body {
+  box-sizing: border-box;
+}
+.Top-Data {
+  font-size: 30px;
+  padding-left: 23px;
+}
+
+.main {
+  height: 75vh;
+}
+.select-add {
+  display: flex;
+  height: 60px;
+  justify-content: space-between;
+  align-items: center;
+  border: 2px solid rgba(0, 0, 0, 0.315);
+}
+.Selection {
+  padding-left: 10px;
+}
+.add {
+  padding-right: 10px;
+}
+
+.Selection select {
+  width: 200px;
+  padding: 10px 15px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+  color: #333;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.add button {
+  background-color: #4c9baf;
+  border: none;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  width: 200px;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: background-color 0.3s;
+}
+
+.add button:hover {
+  background-color: #043983;
+}
