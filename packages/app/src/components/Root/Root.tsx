@@ -6,6 +6,7 @@ import LibraryBooks from '@material-ui/icons/LibraryBooks';
 import CreateComponentIcon from '@material-ui/icons/AddCircleOutline';
 import LogoFull from './LogoFull';
 import LogoIcon from './LogoIcon';
+import MoneyIcon from '@material-ui/icons/MonetizationOn';
 import {
   Settings as SidebarSettings,
   UserSettingsSignInAvatar,
@@ -76,6 +77,7 @@ export const Root = ({ children }: PropsWithChildren<{}>) => (
         <SidebarItem icon={ExtensionIcon} to="api-docs" text="APIs" />
         <SidebarItem icon={LibraryBooks} to="docs" text="Docs" />
         <SidebarItem icon={CreateComponentIcon} to="create" text="Create..." />
+        <SidebarItem icon={MoneyIcon} to="pricing" text="Pricing" />
         {/* End global nav */}
         <SidebarDivider />
         <SidebarScrollWrapper>

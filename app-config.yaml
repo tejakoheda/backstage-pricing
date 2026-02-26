@@ -62,11 +62,11 @@ techdocs:
   publisher:
     type: 'local' # Alternatives - 'googleGcs' or 'awsS3'. Read documentation for using alternatives.
 
-auth:
-  # see https://backstage.io/docs/auth/ to learn about auth providers
-  providers:
-    # See https://backstage.io/docs/auth/guest/provider
-    guest: {}
+# auth:
+#   # see https://backstage.io/docs/auth/ to learn about auth providers
+#   providers:
+#     # See https://backstage.io/docs/auth/guest/provider
+#     guest: {}
 
 scaffolder:
   # see https://backstage.io/docs/features/software-templates/configuration for software template options
@@ -111,3 +111,19 @@ kubernetes:
 permission:
   # setting this to `false` will disable permissions
   enabled: true
+
+auth:
+  environment: development
+  session:
+    secret: openssl 
+  providers:
+    oidc:
+      development:
+        metadataUrl: http://localhost:8080/realms/backstage-realm/.well-known/openid-configuration
+        clientId: backstage
+        clientSecret: J3h1iqALcufkRleQlwQUo3TJXQikMIJ9
+        prompt: auto 
+        signIn:
+          resolvers:
+            - resolver: emailMatchingUserEntityProfileEmail
+              dangerouslyAllowSignInWithoutUserInCatalog: true
