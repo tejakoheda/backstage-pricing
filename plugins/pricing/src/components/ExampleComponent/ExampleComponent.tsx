@@ -1,14 +1,29 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import DataTable from 'react-data-table-component';
+import { useForm, SubmitHandler } from 'react-hook-form';
+
+// form inputs
+type FormInputs = {
+  id?: number;
+  service: string;
+  vehicle: string;
+  price: number;
+  minDist: number;
+  maxDist: number;
+  day: string;
+  startTime: string;
+  endTime: string;
+  multiplier: number;
+  status: string;
+};
 
 export const ExampleComponent = () => {
   const [selectedType, setSelectedType] = useState('Select');
   const [showAddForm, setShowAddForm] = useState(false);
   const [showEditOverlay, setShowEditOverlay] = useState(false);
-  const [editingRow, setEditingRow] = useState<any>(null);
 
   // --- States for Data ---
-  const [flatData, setFlatData] = useState([
+  const [flatData, setFlatData] = useState<any[]>([
     {
       id: 1,
       vehicle: 'Bike',
@@ -19,7 +34,7 @@ export const ExampleComponent = () => {
       status: 'Active',
     },
   ]);
-  const [slabData, setSlabData] = useState([
+  const [slabData, setSlabData] = useState<any[]>([
     {
       id: 1,
       vehicle: 'Car',
@@ -30,7 +45,7 @@ export const ExampleComponent = () => {
       status: 'Inactive',
     },
   ]);
-  const [dayWiseData, setDayWiseData] = useState([
+  const [dayWiseData, setDayWiseData] = useState<any[]>([
     {
       id: 1,
       vehicle: 'Bike',
@@ -43,15 +58,30 @@ export const ExampleComponent = () => {
     },
   ]);
 
-  // --- Form States ---
-  const [formData, setFormData] = useState<any>({
-    service: '',
-    vehicle: '',
-    status: 'Active',
+  // --- React Hook Form for Add Forms ---
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+    watch,
+    clearErrors,
+  } = useForm<FormInputs>({
+    defaultValues: { service: '', vehicle: '', status: 'Active' },
   });
 
-  // Status Cell Styling
-  const statusCell = (row: any) => (
+  // --- React Hook Form for Edit Overlay ---
+  const {
+    register: registerEdit,
+    handleSubmit: handleSubmitEdit,
+    formState: { errors: errorsEdit },
+    reset: resetEdit,
+  } = useForm<FormInputs>();
+
+  const currentMinDist = watch('minDist');
+
+  // Status Styling
+  const status = (row: any) => (
     <span
       className={row.status === 'Active' ? 'status-active' : 'status-expired'}
     >
@@ -59,43 +89,55 @@ export const ExampleComponent = () => {
     </span>
   );
 
-  // --- Columns ---
+  // --- Columns Definitions ---
   const flatColumns = [
-    { name: 'S.No', selector: (row: any) => row.id, width: '70px' },
-    { name: 'Vehicle', selector: (row: any) => row.vehicle },
-    { name: 'Service Type', selector: (row: any) => row.serviceType },
+    {
+      name: 'S.No',
+      cell: (row: any, index: number) => index + 1,
+      width: '90px',
+    },
+    { name: 'Vehicle', selector: (row: any) => row.vehicle, sortable: true },
+    { name: 'Service', selector: (row: any) => row.serviceType },
     { name: 'Flat Price', selector: (row: any) => `₹${row.flatPrice}` },
-    { name: 'Min Distance', selector: (row: any) => `${row.minDist} km` },
-    { name: 'Max Distance', selector: (row: any) => `${row.maxDist} km` },
-    { name: 'Status', cell: statusCell },
+    { name: 'Min Dist', selector: (row: any) => `${row.minDist} km` },
+    { name: 'Max Dist', selector: (row: any) => `${row.maxDist} km` },
+    { name: 'Status', cell: status },
   ];
 
   const slabColumns = [
-    { name: 'S.No', selector: (row: any) => row.id, width: '70px' },
+    {
+      name: 'S.No',
+      cell: (row: any, index: number) => index + 1,
+      width: '70px',
+    },
     { name: 'Vehicle', selector: (row: any) => row.vehicle },
     { name: 'Service', selector: (row: any) => row.service },
     { name: 'Price Per KM', selector: (row: any) => `₹${row.perKmPrice}` },
-    { name: 'Min Distance', selector: (row: any) => `${row.minDist} km` },
-    { name: 'Max Distance', selector: (row: any) => `${row.maxDist} km` },
-    { name: 'Status', cell: statusCell },
+    { name: 'Min Dist', selector: (row: any) => `${row.minDist} km` },
+    { name: 'Max Dist', selector: (row: any) => `${row.maxDist} km` },
+    { name: 'Status', cell: status },
   ];
 
   const dayWiseColumns = [
-    { name: 'S.No', selector: (row: any) => row.id, width: '70px' },
+    {
+      name: 'S.No',
+      cell: (row: any, index: number) => index + 1,
+      width: '70px',
+    },
     { name: 'Vehicle', selector: (row: any) => row.vehicle },
     { name: 'Service', selector: (row: any) => row.service },
     { name: 'Day', selector: (row: any) => row.day },
     { name: 'Start', selector: (row: any) => row.startTime },
     { name: 'End', selector: (row: any) => row.endTime },
     { name: 'Multiplier', selector: (row: any) => `${row.multiplier}x` },
-    { name: 'Status', cell: statusCell },
+    { name: 'Status', cell: status },
     {
       name: 'Actions',
       cell: (row: any) => (
         <button
           className="edit-btn"
           onClick={() => {
-            setEditingRow(row);
+            resetEdit(row);
             setShowEditOverlay(true);
           }}
         >
@@ -105,35 +147,64 @@ export const ExampleComponent = () => {
     },
   ];
 
-  // --- Handlers ---
-  const handleAddData = () => {
-    if (
-      !formData.service ||
-      !formData.vehicle ||
-      formData.service === 'Select' ||
-      formData.vehicle === 'Select'
-    ) {
-      alert('Please select Service and Vehicle');
-      return;
-    }
+  // --- Add Form Submit Handler ---
+  const onAddSubmit: SubmitHandler<FormInputs> = data => {
+    const commonData = {
+      id: Date.now(),
+      service: data.service,
+      vehicle: data.vehicle,
+      status: data.status || 'Active',
+    };
 
-    const commonData = { ...formData, id: Date.now() };
     if (selectedType === 'Flat') {
       setFlatData([
         ...flatData,
         {
           ...commonData,
-          serviceType: formData.service,
-          flatPrice: formData.price,
+          serviceType: data.service,
+          flatPrice: data.price,
+          minDist: data.minDist,
+          maxDist: data.maxDist,
         },
       ]);
     } else if (selectedType === 'slab') {
-      setSlabData([...slabData, { ...commonData, perKmPrice: formData.price }]);
+      setSlabData([
+        ...slabData,
+        {
+          ...commonData,
+          perKmPrice: data.price,
+          minDist: data.minDist,
+          maxDist: data.maxDist,
+        },
+      ]);
     } else if (selectedType === 'DayWise') {
-      setDayWiseData([...dayWiseData, commonData]);
+      setDayWiseData([
+        ...dayWiseData,
+        {
+          ...commonData,
+          day: data.day,
+          startTime: data.startTime,
+          endTime: data.endTime,
+          multiplier: data.multiplier,
+        },
+      ]);
     }
+
     setShowAddForm(false);
-    setFormData({ service: '', vehicle: '', status: 'Active' });
+    reset(); // form reset
+  };
+
+  // --- Edit Form Submit Handler ---
+  const onEditSubmit: SubmitHandler<FormInputs> = data => {
+    setDayWiseData(dayWiseData.map(d => (d.id === data.id ? data : d)));
+    setShowEditOverlay(false);
+  };
+
+  const handleTypeChange = (e: any) => {
+    setSelectedType(e.target.value);
+    setShowAddForm(false);
+    reset();
+    clearErrors();
   };
 
   return (
@@ -141,20 +212,20 @@ export const ExampleComponent = () => {
       <h1 className="Top-Data">Price Management</h1>
 
       <div className="select-add">
-        <select
-          value={selectedType}
-          onChange={e => {
-            setSelectedType(e.target.value);
-            setShowAddForm(false);
-          }}
-        >
+        <select value={selectedType} onChange={handleTypeChange}>
           <option value="Select">Select Type</option>
           <option value="Flat">Flat</option>
           <option value="slab">Slab</option>
           <option value="DayWise">DayWise</option>
         </select>
         {selectedType !== 'Select' && (
-          <button className="add-btn" onClick={() => setShowAddForm(true)}>
+          <button
+            className="add-btn"
+            onClick={() => {
+              reset();
+              setShowAddForm(true);
+            }}
+          >
             Add Price
           </button>
         )}
@@ -166,176 +237,190 @@ export const ExampleComponent = () => {
         </div>
       )}
 
+      {/* --- ADD PRICE FORM --- */}
       {showAddForm && selectedType !== 'Select' && (
         <div className="form-container">
-          <div className="form-grid">
-            <div className="form-group">
-              <label>Service</label>
-              <select
-                value={formData.service}
-                onChange={e =>
-                  setFormData({ ...formData, service: e.target.value })
-                }
-              >
-                <option value="">Select Service</option>
-                <option value="Ride">Ride</option>
-                <option value="Parcel">Parcel</option>
-                <option value="Scheduled">Scheduled</option>
-              </select>
+          <form onSubmit={handleSubmit(onAddSubmit)}>
+            <div className="form-grid">
+              {/* Common Fields */}
+              <div className="form-group">
+                <label>Service</label>
+                <select
+                  {...register('service', { required: 'Service is required' })}
+                >
+                  <option value="">Select Service</option>
+                  <option value="Ride">Ride</option>
+                  <option value="Parcel">Parcel</option>
+                  <option value="Scheduled">Scheduled</option>
+                </select>
+                {errors.service && (
+                  <span className="error-text">{errors.service.message}</span>
+                )}
+              </div>
+
+              <div className="form-group">
+                <label>Vehicle</label>
+                <select
+                  {...register('vehicle', { required: 'Vehicle is required' })}
+                >
+                  <option value="">Select Vehicle</option>
+                  <option value="Bike">Bike</option>
+                  <option value="Auto">Auto</option>
+                  <option value="Car">Car</option>
+                </select>
+                {errors.vehicle && (
+                  <span className="error-text">{errors.vehicle.message}</span>
+                )}
+              </div>
+
+              {/* Flat & Slab Specific Fields */}
+              {(selectedType === 'Flat' || selectedType === 'slab') && (
+                <>
+                  <div className="form-group">
+                    <label>
+                      {selectedType === 'Flat' ? 'Price' : 'Price/KM'}
+                    </label>
+                    <input
+                      type="number"
+                      placeholder="e.g. 100"
+                      {...register('price', {
+                        required: 'Price is required',
+                        min: { value: 1, message: 'Must be > 0' },
+                      })}
+                    />
+                    {errors.price && (
+                      <span className="error-text">{errors.price.message}</span>
+                    )}
+                  </div>
+
+                  <div className="form-group">
+                    <label>Min Dist (KM)</label>
+                    <input
+                      type="number"
+                      placeholder="e.g. 0"
+                      {...register('minDist', {
+                        required: 'Required',
+                        min: { value: 0, message: 'Invalid' },
+                      })}
+                    />
+                    {errors.minDist && (
+                      <span className="error-text">
+                        {errors.minDist.message}
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="form-group">
+                    <label>Max Dist (KM)</label>
+                    <input
+                      type="number"
+                      placeholder="e.g. 10"
+                      {...register('maxDist', {
+                        required: 'Required',
+                        validate: value =>
+                          !currentMinDist ||
+                          value > currentMinDist ||
+                          'Must be > Min Dist',
+                      })}
+                    />
+                    {errors.maxDist && (
+                      <span className="error-text">
+                        {errors.maxDist.message}
+                      </span>
+                    )}
+                  </div>
+                </>
+              )}
+
+              {/* DayWise Specific Fields */}
+              {selectedType === 'DayWise' && (
+                <>
+                  <div className="form-group">
+                    <label>Day</label>
+                    <input
+                      placeholder="e.g. Monday"
+                      {...register('day', { required: 'Day is required' })}
+                    />
+                    {errors.day && (
+                      <span className="error-text">{errors.day.message}</span>
+                    )}
+                  </div>
+                  <div className="form-group">
+                    <label>Start Time</label>
+                    <input
+                      type="time"
+                      {...register('startTime', {
+                        required: 'Start time required',
+                      })}
+                    />
+                    {errors.startTime && (
+                      <span className="error-text">
+                        {errors.startTime.message}
+                      </span>
+                    )}
+                  </div>
+                  <div className="form-group">
+                    <label>End Time</label>
+                    <input
+                      type="time"
+                      {...register('endTime', {
+                        required: 'End time required',
+                      })}
+                    />
+                    {errors.endTime && (
+                      <span className="error-text">
+                        {errors.endTime.message}
+                      </span>
+                    )}
+                  </div>
+                  <div className="form-group">
+                    <label>Multiplier</label>
+                    <input
+                      type="number"
+                      step="0.1"
+                      placeholder="e.g. 1.2"
+                      {...register('multiplier', {
+                        required: 'Required',
+                        min: { value: 0.1, message: 'Min 0.1' },
+                      })}
+                    />
+                    {errors.multiplier && (
+                      <span className="error-text">
+                        {errors.multiplier.message}
+                      </span>
+                    )}
+                  </div>
+                  <div className="form-group">
+                    <label>Status</label>
+                    <select {...register('status')}>
+                      <option value="Active">Active</option>
+                      <option value="Inactive">Inactive</option>
+                    </select>
+                  </div>
+                </>
+              )}
             </div>
-            <div className="form-group">
-              <label>Vehicle</label>
-              <select
-                value={formData.vehicle}
-                onChange={e =>
-                  setFormData({ ...formData, vehicle: e.target.value })
-                }
+
+            <div className="form-actions">
+              <button
+                type="button"
+                className="cancel-btn"
+                onClick={() => {
+                  setShowAddForm(false);
+                  reset();
+                }}
               >
-                <option value="">Select Vehicle</option>
-                <option value="Bike">Bike</option>
-                <option value="Auto">Auto</option>
-                <option value="Car">Car</option>
-              </select>
+                Cancel
+              </button>
+              <button type="submit" className="save-btn">
+                Add Price
+              </button>
             </div>
-
-            {selectedType === 'Flat' && (
-              <>
-                <div className="form-group">
-                  <label>Min KM</label>
-                  <input
-                    type="number"
-                    placeholder="e.g. 0"
-                    onChange={e =>
-                      setFormData({ ...formData, minDist: e.target.value })
-                    }
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Max KM</label>
-                  <input
-                    type="number"
-                    placeholder="e.g. 10"
-                    onChange={e =>
-                      setFormData({ ...formData, maxDist: e.target.value })
-                    }
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Price</label>
-                  <input
-                    type="number"
-                    placeholder="e.g. 100"
-                    onChange={e =>
-                      setFormData({ ...formData, price: e.target.value })
-                    }
-                  />
-                </div>
-              </>
-            )}
-
-            {selectedType === 'slab' && (
-              <>
-                <div className="form-group">
-                  <label>Price/KM</label>
-                  <input
-                    type="number"
-                    placeholder="e.g. 15"
-                    onChange={e =>
-                      setFormData({ ...formData, price: e.target.value })
-                    }
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Min Dist</label>
-                  <input
-                    type="number"
-                    placeholder="e.g. 5"
-                    onChange={e =>
-                      setFormData({ ...formData, minDist: e.target.value })
-                    }
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Max Dist</label>
-                  <input
-                    type="number"
-                    placeholder="e.g. 20"
-                    onChange={e =>
-                      setFormData({ ...formData, maxDist: e.target.value })
-                    }
-                  />
-                </div>
-              </>
-            )}
-
-            {selectedType === 'DayWise' && (
-              <>
-                <div className="form-group">
-                  <label>Day</label>
-                  <input
-                    placeholder="e.g. Monday"
-                    onChange={e =>
-                      setFormData({ ...formData, day: e.target.value })
-                    }
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Start Time</label>
-                  <input
-                    type="time"
-                    onChange={e =>
-                      setFormData({ ...formData, startTime: e.target.value })
-                    }
-                  />
-                </div>
-                <div className="form-group">
-                  <label>End Time</label>
-                  <input
-                    type="time"
-                    onChange={e =>
-                      setFormData({ ...formData, endTime: e.target.value })
-                    }
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Multiplier</label>
-                  <input
-                    type="number"
-                    step="0.1"
-                    placeholder="e.g. 1.2"
-                    onChange={e =>
-                      setFormData({ ...formData, multiplier: e.target.value })
-                    }
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Status</label>
-                  <select
-                    onChange={e =>
-                      setFormData({ ...formData, status: e.target.value })
-                    }
-                  >
-                    <option value="Active">Active</option>
-                    <option value="Inactive">Inactive</option>
-                  </select>
-                </div>
-              </>
-            )}
-          </div>
-          <div className="form-actions">
-            <button
-              className="cancel-btn"
-              onClick={() => setShowAddForm(false)}
-            >
-              Cancel
-            </button>
-            <button className="save-btn" onClick={handleAddData}>
-              Add Price
-            </button>
-          </div>
+          </form>
         </div>
       )}
 
+      {/* --- DATA TABLE --- */}
       {selectedType !== 'Select' && (
         <div className="table">
           <DataTable
@@ -359,83 +444,90 @@ export const ExampleComponent = () => {
         </div>
       )}
 
+      {/* --- EDIT OVERLAY --- */}
       {showEditOverlay && (
         <div className="overlay">
           <div className="modal-content">
             <h3>Edit DayWise Price</h3>
-            <div className="form-group">
-              <label>Day</label>
-              <input
-                value={editingRow.day}
-                onChange={e =>
-                  setEditingRow({ ...editingRow, day: e.target.value })
-                }
-              />
-            </div>
-            <div className="form-group">
-              <label>Start Time</label>
-              <input
-                type="time"
-                value={editingRow.startTime}
-                onChange={e =>
-                  setEditingRow({ ...editingRow, startTime: e.target.value })
-                }
-              />
-            </div>
-            <div className="form-group">
-              <label>End Time</label>
-              <input
-                type="time"
-                value={editingRow.endTime}
-                onChange={e =>
-                  setEditingRow({ ...editingRow, endTime: e.target.value })
-                }
-              />
-            </div>
-            <div className="form-group">
-              <label>Multiplier</label>
-              <input
-                type="number"
-                step="0.1"
-                value={editingRow.multiplier}
-                onChange={e =>
-                  setEditingRow({ ...editingRow, multiplier: e.target.value })
-                }
-              />
-            </div>
-            <div className="form-group">
-              <label>Status</label>
-              <select
-                value={editingRow.status}
-                onChange={e =>
-                  setEditingRow({ ...editingRow, status: e.target.value })
-                }
-              >
-                <option value="Active">Active</option>
-                <option value="Inactive">Inactive</option>
-              </select>
-            </div>
-            <div className="form-actions">
-              <button
-                className="cancel-btn"
-                onClick={() => setShowEditOverlay(false)}
-              >
-                Cancel
-              </button>
-              <button
-                className="update-btn"
-                onClick={() => {
-                  setDayWiseData(
-                    dayWiseData.map(d =>
-                      d.id === editingRow.id ? editingRow : d,
-                    ),
-                  );
-                  setShowEditOverlay(false);
-                }}
-              >
-                Update
-              </button>
-            </div>
+            <form onSubmit={handleSubmitEdit(onEditSubmit)}>
+              <div className="form-group" style={{ marginBottom: '15px' }}>
+                <label>Day</label>
+                <input
+                  {...registerEdit('day', { required: 'Day is required' })}
+                />
+                {errorsEdit.day && (
+                  <span className="error-text">{errorsEdit.day.message}</span>
+                )}
+              </div>
+
+              <div className="form-group" style={{ marginBottom: '15px' }}>
+                <label>Start Time</label>
+                <input
+                  type="time"
+                  {...registerEdit('startTime', {
+                    required: 'Start time required',
+                  })}
+                />
+                {errorsEdit.startTime && (
+                  <span className="error-text">
+                    {errorsEdit.startTime.message}
+                  </span>
+                )}
+              </div>
+
+              <div className="form-group" style={{ marginBottom: '15px' }}>
+                <label>End Time</label>
+                <input
+                  type="time"
+                  {...registerEdit('endTime', {
+                    required: 'End time required',
+                  })}
+                />
+                {errorsEdit.endTime && (
+                  <span className="error-text">
+                    {errorsEdit.endTime.message}
+                  </span>
+                )}
+              </div>
+
+              <div className="form-group" style={{ marginBottom: '15px' }}>
+                <label>Multiplier</label>
+                <input
+                  type="number"
+                  step="0.1"
+                  {...registerEdit('multiplier', {
+                    required: 'Required',
+                    min: { value: 0.1, message: 'Min 0.1' },
+                  })}
+                />
+                {errorsEdit.multiplier && (
+                  <span className="error-text">
+                    {errorsEdit.multiplier.message}
+                  </span>
+                )}
+              </div>
+
+              <div className="form-group" style={{ marginBottom: '20px' }}>
+                <label>Status</label>
+                <select {...registerEdit('status')}>
+                  <option value="Active">Active</option>
+                  <option value="Inactive">Inactive</option>
+                </select>
+              </div>
+
+              <div className="form-actions">
+                <button
+                  type="button"
+                  className="cancel-btn"
+                  onClick={() => setShowEditOverlay(false)}
+                >
+                  Cancel
+                </button>
+                <button type="submit" className="update-btn">
+                  Update
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

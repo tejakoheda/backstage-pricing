@@ -142,3 +142,11 @@
   margin-top: 20px;
   font-weight: 500;
 }
+
+.error-text {
+  color: #dc2626;
+  font-size: 11px;
+  margin-top: 4px;
+  display: block;
+  font-weight: 500;
+}
