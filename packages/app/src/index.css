@@ -1,55 +1,144 @@
-body {
-  box-sizing: border-box;
+/* Pricing Page Styles */
+.price {
+  padding: 25px;
+  background-color: #f8fafc;
+  min-height: 100vh;
 }
 .Top-Data {
-  font-size: 30px;
-  padding-left: 23px;
+  font-size: 26px;
+  color: #1e293b;
+  margin-bottom: 25px;
 }
 
-.main {
-  height: 75vh;
-}
 .select-add {
   display: flex;
-  height: 60px;
-  justify-content: space-between;
-  align-items: center;
-  border: 2px solid rgba(0, 0, 0, 0.315);
+  gap: 15px;
+  margin-bottom: 20px;
 }
-.Selection {
-  padding-left: 10px;
-}
-.add {
-  padding-right: 10px;
+.select-add select {
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid #cbd5e1;
+  min-width: 150px;
 }
 
-.Selection select {
-  width: 200px;
-  padding: 10px 15px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  background-color: #f9f9f9;
-  color: #333;
-  font-size: 16px;
-  cursor: pointer;
-}
-
-.add button {
-  background-color: #4c9baf;
-  border: none;
+/* Button Colors */
+.add-btn,
+.save-btn {
+  background-color: #2563eb;
   color: white;
-  padding: 15px 32px;
-  text-align: center;
-  width: 200px;
-  text-decoration: none;
-  display: inline-block;
-  font-size: 16px;
-  margin: 4px 2px;
+  border: none;
+  padding: 8px 18px;
+  border-radius: 6px;
   cursor: pointer;
-  border-radius: 8px;
-  transition: background-color 0.3s;
+  font-weight: 500;
+}
+.cancel-btn {
+  background-color: #dc2626;
+  color: white;
+  border: none;
+  padding: 8px 18px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.edit-btn {
+  background-color: #facc15;
+  color: #1e293b;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 600;
+}
+.update-btn {
+  background-color: #facc15;
+  color: #1e293b;
+  border: none;
+  padding: 8px 18px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
 }
 
-.add button:hover {
-  background-color: #043983;
+/* Status Colors */
+.status-active {
+  color: #16a34a;
+  font-weight: bold;
+} /* Green */
+.status-expired {
+  color: #dc2626;
+  font-weight: bold;
+} /* Red */
+
+/* Initial message */
+.message-container {
+  text-align: center;
+  margin-top: 50px;
+  background: white;
+  padding: 40px;
+  border-radius: 10px;
+  border: 1px dashed #cbd5e1;
+}
+.display-msg {
+  color: #64748b;
+  font-size: 18px;
+  text-transform: capitalize;
+}
+
+/* Forms & Overlay */
+.form-container {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  margin-bottom: 25px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 15px;
+}
+.form-group label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: #475569;
+  margin-bottom: 5px;
+}
+.form-group input,
+.form-group select {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+}
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+}
+.modal-content {
+  background: white;
+  padding: 25px;
+  border-radius: 12px;
+  width: 400px;
+}
+.display-msg {
+  color: #64748b;
+  font-size: 18px;
+  text-align: center;
+  margin-top: 20px;
+  font-weight: 500;
 }
