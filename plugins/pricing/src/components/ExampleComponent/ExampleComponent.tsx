@@ -191,7 +191,7 @@ export const ExampleComponent = () => {
     }
 
     setShowAddForm(false);
-    reset(); // form reset
+    reset(); // reset
   };
 
   // --- Edit Form Submit Handler ---
@@ -237,9 +237,15 @@ export const ExampleComponent = () => {
         </div>
       )}
 
-      {/* --- ADD PRICE FORM --- */}
+      {/* ADD PRICE FORM */}
       {showAddForm && selectedType !== 'Select' && (
-        <div className="form-container">
+        <div
+          style={{
+            padding: '20px',
+            borderRadius: '8px',
+            border: '1px solid black',
+          }}
+        >
           <form onSubmit={handleSubmit(onAddSubmit)}>
             <div className="form-grid">
               {/* Common Fields */}
