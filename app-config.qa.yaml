@@ -1,0 +1,13 @@
+ auth:
+  environment: development
+  providers:
+    oidc:
+      development:
+        metadataUrl: http://localhost:8080/realms/BackstageQA/.well-known/openid-configuration
+        clientId: BackstageQA
+        clientSecret: gLhyWV3pLk7RYIzlJw26RG0SY54FS9uF
+        prompt: auto 
+        signIn:
+          resolvers:
+            - resolver: emailMatchingUserEntityProfileEmail
+              dangerouslyAllowSignInWithoutUserInCatalog: true
